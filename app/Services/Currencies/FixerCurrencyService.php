@@ -33,9 +33,26 @@ class FixerCurrencyService implements CurrencyContract
     /**
      * @inheritDoc
      */
+
+     public function currencyConverter($fromCurrency,$toCurrency,$amount) {
+       $fromCurrency = urlencode($fromCurrency);
+       $toCurrency = urlencode($toCurrency);
+       $url = "https://www.google.com/search?q=".$fromCurrency."+to+".$toCurrency;
+       $get = file_get_contents($url);
+       $data = preg_split('/\D\s(.*?)\s=\s/',$get);
+       $exhangeRate = (float) substr($data[1],0,7);
+       $convertedAmount = $amount*$exhangeRate;
+       $data = $convertedAmount;
+       return $data;
+     }
+
     public function convert(string $from, string $to, float $sum): float
     {
-        return $sum;
+        if($from == $to) {
+            return $sum;
+          }
+        $converted_currency=self::currencyConverter($from, $to, $sum);
+        return $converted_currency;
     }
 
     /**
